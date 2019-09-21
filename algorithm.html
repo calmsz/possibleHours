@@ -1,0 +1,62 @@
+<html>
+<p>
+  Please type 1 numeric digit into each one of the inputs and press the 
+  <input type="button" value="->" onclick="javascript: howManyHours(a.value, b.value, c.value, d.value);"> button.
+</p>
+<p>
+  <i>
+    You'll get all the possible hours created using those digits.
+  </i>
+</p>
+<form>
+  <input type="number" name="a" id="a" min="0" max="9">
+  <input type="number" name="b" id="b" min="0" max="9">
+  <input type="number" name="c" id="c" min="0" max="9">
+  <input type="number" name="d" id="d" min="0" max="9">
+  <input type="button" value="->" onclick="javascript: howManyHours(a.value, b.value, c.value, d.value);">
+</form>
+<label for="totalOfPossibleHours">Valid permutations: </label>
+<input type="text" name="totalOfPossibleHours" id="totalOfPossibleHours" disabled readonly>
+<div id="outputElement"></div>
+</html>
+
+<script>
+const howManyHours = (a, b, c, d) => {
+    
+  outputElement.innerHTML = "";
+  let possibleHourText = [];
+  let permutations = [];
+  let possibleHour = [];
+
+  for (i=0; i<=2; i++) { 
+    for (j=0; j<=9; j++) { 
+      for (k=0; k<=5; k++) { 
+        for (l=0; l<=9; l++) {
+          possibleHourText= `${i}${j}:${k}${l}`;
+          possibleHour = [`${i}`, `${j}`, `${k}`, `${l}`];
+          if (possibleHour.indexOf(`${a}`) !== -1) {
+            possibleHour[possibleHour.indexOf(`${a}`)] = undefined;
+            if (possibleHour.indexOf(`${b}`) !== -1) {
+              possibleHour[possibleHour.indexOf(`${b}`)] = undefined;
+              if (possibleHour.indexOf(`${c}`) !== -1) {
+                possibleHour[possibleHour.indexOf(`${c}`)] = undefined;
+                if (possibleHour.indexOf(`${d}`) !== -1) {
+                  permutations.push(possibleHour);
+                  outputElement.innerHTML += `<p>${possibleHourText}</p>`;
+                }
+              }
+            }            
+          }
+        }
+      }
+      if (i===2 && j ===3) {
+        break;
+      }
+    }
+  }
+
+  totalOfPossibleHours.value = permutations.length;
+
+  return `all good`};
+
+</script>
