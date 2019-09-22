@@ -1,7 +1,6 @@
 <html>
 <p>
-  Please type 1 numeric digit into each one of the inputs and press the 
-  <input type="button" value="->" onclick="javascript: howManyHours(a.value, b.value, c.value, d.value);"> button.
+  Please type 1 numeric digit into each one of the inputs and press the "->" button.
 </p>
 <p>
   <i>
@@ -13,17 +12,49 @@
   <input type="number" name="b" id="b" min="0" max="9">
   <input type="number" name="c" id="c" min="0" max="9">
   <input type="number" name="d" id="d" min="0" max="9">
-  <input type="button" value="->" onclick="javascript: howManyHours(a.value, b.value, c.value, d.value);">
+  <input type="button" id="calc" name="calc" value="->">
 </form>
-<label for="totalOfPossibleHours">Valid permutations: </label>
-<input type="text" name="totalOfPossibleHours" id="totalOfPossibleHours" disabled readonly>
-<div id="outputElement"></div>
+<table cellpadding="10">
+  <tr>
+    <td>
+      <p>
+        Brute force approach:
+      </p>
+      <p>
+        <label for="executionTimeBf">Execution time: </label>
+        <input type="text" name="executionTimeBf" id="executionTimeBf" disabled readonly>
+      </p>
+      <p>
+        <label for="totalOfPossibleHoursBf">Valid permutations: </label>
+        <input type="text" name="totalOfPossibleHoursBf" id="totalOfPossibleHoursBf" disabled readonly>        
+      </p>
+    </td>
+    <td align="right">
+      <p>
+        Second try approach:
+      </p>
+      <p>
+        <label for="executionTimeSt">Execution time: </label>
+        <input type="text" name="executionTimeSt" id="executionTimeSt" disabled readonly>
+      </p>
+      <p>
+        <label for="totalOfPossibleHoursSt">Valid permutations: </label>
+        <input type="text" name="totalOfPossibleHoursSt" id="totalOfPossibleHoursSt" disabled readonly>        
+      </p>
+    </td>
+  </tr>
+  <!--here the results-->
+  <tr>
+    <td><div id="outputElementBf"></div></td>
+    <td><div id="outputElementSt"></div></td>
+  </tr>
+</table>
 </html>
 
 <script>
 const howManyHours = (a, b, c, d) => {
     
-  outputElement.innerHTML = "";
+  outputElementBf.innerHTML = "";
   let possibleHourText = [];
   let permutations = [];
   let possibleHour = [];
@@ -42,7 +73,7 @@ const howManyHours = (a, b, c, d) => {
                 possibleHour[possibleHour.indexOf(`${c}`)] = undefined;
                 if (possibleHour.indexOf(`${d}`) !== -1) {
                   permutations.push(possibleHour);
-                  outputElement.innerHTML += `<p>${possibleHourText}</p>`;
+                  outputElementBf.innerHTML += `<p>${possibleHourText}</p>`;
                 }
               }
             }            
@@ -55,8 +86,86 @@ const howManyHours = (a, b, c, d) => {
     }
   }
 
-  totalOfPossibleHours.value = permutations.length;
+  totalOfPossibleHoursBf.value = permutations.length;
 
-  return `all good`};
+  return `all good`
+};
+
+/*
+SECOND APPROACH
+*/
+class permMachine {
+  constructor() {
+    this.hourHash = (() => {
+      let outputHash = {};
+        for (let i=0; i<=2; i++) { 
+          for (let j=0; j<=9; j++) { 
+            for (let k=0; k<=5; k++) { 
+              for (let l=0; l<=9; l++) {
+                outputHash[`${i}${j}:${k}${l}`] = true;
+              }
+            }
+            if (i===2 && j ===3) {
+              break;
+            }
+          }
+        }
+        return outputHash;
+    })();
+
+    // adding actions to button and registering executions times
+    calc.onclick = () => {
+      const startBruteforce = window.performance.now();
+      howManyHours(a.value, b.value, c.value, d.value);
+      const endBruteforce = window.performance.now();
+      const timeBruteforce = endBruteforce - startBruteforce;
+
+      const startSecondtry = window.performance.now();
+      this.getProbabilities(a.value, b.value, c.value, d.value);
+      const endSecondtry = window.performance.now();
+      const timeSecondtry = endSecondtry - startSecondtry;
+
+      executionTimeBf.value = timeBruteforce;
+      executionTimeSt.value = timeSecondtry;
+    };
+  }
+
+
+
+  getProbabilities(a, b, c, d) {
+
+    outputElementSt.innerHTML = "";
+    let permutationsSt = [];
+    let paramsToCombine = [a, b, c, d];
+    let perms3Digits = (x, y, z) => {
+      let innerOutput = [];
+      innerOutput.push(`${x}:${y}${z}`)
+      innerOutput.push(`${x}:${z}${y}`)
+      innerOutput.push(`${y}:${x}${z}`)
+      innerOutput.push(`${y}:${z}${x}`)
+      innerOutput.push(`${z}:${y}${x}`)
+      innerOutput.push(`${z}:${x}${y}`)
+      return innerOutput;
+    };
+    
+    paramsToCombine.map((digit) => {
+      let tempParamsToCombine = paramsToCombine.filter(function(x) { return x !== digit; })
+      let restOfDigits = perms3Digits(tempParamsToCombine[0], tempParamsToCombine[1], tempParamsToCombine[2]);
+      for (let index = 0; index < restOfDigits.length; index++) {
+        if (this.hourHash[`${digit}${restOfDigits[index]}`] === true) {
+          permutationsSt.push(`${digit}${restOfDigits[index]}`);
+          outputElementSt.innerHTML += `<p>${digit}${restOfDigits[index]}</p>`;
+        } 
+      }
+    });
+    
+    totalOfPossibleHoursSt.value = permutationsSt.length;
+
+    return `all good`
+  }
+
+}
+
+let calculator = new permMachine();
 
 </script>
