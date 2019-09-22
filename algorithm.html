@@ -148,17 +148,22 @@ class permMachine {
       return innerOutput;
     };
     
-    paramsToCombine.map((digit) => {
-      let tempParamsToCombine = paramsToCombine.filter(function(x) { return x !== digit; })
+    for (let j = 0; j < paramsToCombine.length; j++) {
+      const digit = paramsToCombine[j];
+      let tempParamsToCombine = paramsToCombine.slice();
+      tempParamsToCombine.splice(j,1);
+
       let restOfDigits = perms3Digits(tempParamsToCombine[0], tempParamsToCombine[1], tempParamsToCombine[2]);
+      let possibleHourText = ``;
       for (let index = 0; index < restOfDigits.length; index++) {
-        if (this.hourHash[`${digit}${restOfDigits[index]}`] === true) {
-          permutationsSt.push(`${digit}${restOfDigits[index]}`);
-          outputElementSt.innerHTML += `<p>${digit}${restOfDigits[index]}</p>`;
+        possibleHourText = `${digit}${restOfDigits[index]}`;
+        if ((this.hourHash[possibleHourText] === true) && (permutationsSt.indexOf(possibleHourText) == -1)) {
+          permutationsSt.push(possibleHourText);
+          outputElementSt.innerHTML += `<p>${possibleHourText}</p>`;
         } 
       }
-    });
-    
+      
+    }
     totalOfPossibleHoursSt.value = permutationsSt.length;
 
     return `all good`
